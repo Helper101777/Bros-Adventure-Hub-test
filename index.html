@@ -133,6 +133,21 @@
       </form>
     </div>
   </section>
+  <!-- Calendar -->
+<section id="calendar">
+  <h2>Calendar</h2>
+  <div class="panel">
+    <div id="calendarBoard" class="list"></div>
+    <form id="calendarForm">
+      <input id="calendarName" placeholder="Your name" required />
+      <input id="calendarTitle" placeholder="Event title" required />
+      <input id="calendarDate" type="date" required />
+      <textarea id="calendarDetails" placeholder="Details..." required></textarea>
+      <button type="submit">Add Event</button>
+    </form>
+  </div>
+</section>
+
 
   <!-- Attractions with Book Now -->
   <section id="attractions">
@@ -149,6 +164,7 @@
   </section>
 
   <script type="module">
+    
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import {
       getFirestore, collection, addDoc, serverTimestamp,
@@ -236,6 +252,37 @@
         board.appendChild(item);
       });
     });
+    const calendarRef = collection(db, "calendar");
+
+onSnapshot(query(calendarRef, orderBy("tsClient","desc")), snap => {
+  const board = document.getElementById("calendarBoard");
+  board.innerHTML = "";
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
+    const item = document.createElement("div");
+    item.className = "item";
+    item.innerHTML = `
+      <div class="item-main">
+        <strong>${data.title}</strong> (${data.date})
+        <div>by ${data.name}</div>
+        <div>${data.details}</div>
+      </div>
+    `;
+    board.appendChild(item);
+  });
+});
+
+document.getElementById("calendarForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = document.getElementById("calendarName").value.trim();
+  const title = document.getElementById("calendarTitle").value.trim();
+  const date = document.getElementById("calendarDate").value;
+  const details = document.getElementById("calendarDetails").value.trim();
+  if (!name || !title || !date || !details) return;
+  await addDoc(calendarRef, { name, title, date, details, tsClient: Date.now(), tsServer: serverTimestamp() });
+  e.target.reset();
+});
+
 
     onSnapshot(query(announcementsRef, orderBy("tsClient","desc")), snap => {
       const board = document.getElementById("announcementsBoard");
@@ -377,3 +424,4 @@
   </script>
 </body>
 </html>
+
