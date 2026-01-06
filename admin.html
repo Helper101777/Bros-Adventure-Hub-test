@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bros Hub – Admin Bookings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0d0d0d; --panel:#1a1a1a; --neon:#00ff66; --muted:#82ffa6; }
+    body { margin:0; background:var(--bg); color:var(--neon); font-family:system-ui, Trebuchet MS, sans-serif; }
+    header { padding:1.5rem; text-align:center; background:var(--panel); border-bottom:2px solid var(--neon); }
+    h1 { margin:0; }
+    nav { background:var(--bg); border-bottom:2px solid var(--neon); position:sticky; top:0; z-index:1000; }
+    nav ul { list-style:none; display:flex; flex-wrap:wrap; gap:.5rem; padding:.6rem; margin:0; justify-content:center; }
+    nav a { color:var(--neon); text-decoration:none; padding:.4rem .8rem; border:1px solid var(--neon); border-radius:4px; font-weight:600; }
+    nav a:hover { background:var(--neon); color:var(--bg); }
+    section { max-width:900px; margin:auto; padding:1rem; }
+    h2 { border-bottom:2px solid var(--neon); padding-bottom:.3rem; }
+    .panel { background:var(--panel); border:1px solid var(--neon); border-radius:8px; padding:1rem; }
+    .list { display:flex; flex-direction:column; gap:.6rem; }
+    .item { display:flex; justify-content:space-between; align-items:flex-start; border:1px dashed var(--neon); border-radius:6px; padding:.6rem; }
+    .item-main { flex:1; }
+    .item-meta { font-size:.85rem; color:var(--muted); margin-top:.25rem; }
+    .actions { display:flex; gap:.4rem; }
+    .btn { background:none; border:1px solid var(--neon); color:var(--neon); padding:.25rem .6rem; border-radius:4px; cursor:pointer; }
+    .btn:hover { background:var(--neon); color:var(--bg); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin – Bookings</h1>
+    <div class="item-meta">Manage all incoming bookings here</div>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">Hub</a></li>
+      <li><a href="admin.html">Bookings Admin</a></li>
+    </ul>
+  </nav>
+
+  <section id="adminBookings">
+    <h2>Incoming Bookings</h2>
+    <div class="panel">
+      <div id="bookingsBoard" class="list"></div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOWDg95YOPCBYzN5vWOVBik0AUNOyqZeI",
+      authDomain: "bros-hub-cdbf2.firebaseapp.com",
+      projectId: "bros-hub-cdbf2",
+      storageBucket: "bros-hub-cdbf2.firebasestorage.app",
+      messagingSenderId: "704367128264",
+      appId: "1:704367128264:web:2234b7b809a4691b327ffd",
+      measurementId: "G-1DG5BKM4SH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const bookingsRef = collection(db, "bookings");
+
+    // Live bookings list
+    onSnapshot(query(bookingsRef, orderBy("tsClient","desc")), snap => {
+      const board = document.getElementById("bookingsBoard");
+      board.innerHTML = "";
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const main = document.createElement("div");
+        main.className = "item-main";
+        main.innerHTML = `
+          <strong>${d.customer || "Anonymous"}</strong> booked <em>${d.attraction}</em><br/>
+          Price: $${d.price}
+          <div class="item-meta">Status: ${d.status}</div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const confirmBtn = document.createElement("button");
+        confirmBtn.className = "btn";
+        confirmBtn.textContent = "Confirm";
+        confirmBtn.onclick = async () => {
+          await updateDoc(doc(db, "bookings", docSnap.id), { status: "confirmed" });
+        };
+
+        const completeBtn = document.createElement("button");
+        completeBtn.className = "btn";
+        completeBtn.textContent = "Completed";
+        completeBtn.onclick = async () => {
+          await updateDoc(doc(db, "bookings", docSnap.id), { status: "completed" });
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = async () => {
+          if (confirm("Are you sure you want to delete this booking?")) {
+            await deleteDoc(doc(db, "bookings", docSnap.id));
+          }
+        };
+
+        actions.appendChild(confirmBtn);
+        actions.appendChild(completeBtn);
+        actions.appendChild(deleteBtn);
+
+        div.appendChild(main);
+        div.appendChild(actions);
+        board.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>
