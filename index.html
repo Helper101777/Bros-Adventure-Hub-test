@@ -7,37 +7,37 @@
   <style>
     :root { --bg:#0d0d0d; --panel:#1a1a1a; --neon:#00ff66; --muted:#82ffa6; }
     * { box-sizing:border-box; }
-    body { margin:0; background:var(--bg); color:var(--neon); font-family:system-ui, Segoe UI, Trebuchet MS, sans-serif; }
+    body { margin:0; background:var(--bg); color:var(--neon); font-family:system-ui, Trebuchet MS, sans-serif; }
     header { padding:1.5rem; text-align:center; background:var(--panel); border-bottom:2px solid var(--neon); }
-    nav { position:sticky; top:0; z-index:10; background:var(--bg); border-bottom:2px solid var(--neon); }
+    h1 { margin:0; }
+    nav { background:var(--bg); border-bottom:2px solid var(--neon); }
     nav ul { list-style:none; display:flex; flex-wrap:wrap; gap:.5rem; padding:.6rem; margin:0; justify-content:center; }
     nav a { color:var(--neon); text-decoration:none; padding:.4rem .8rem; border:1px solid var(--neon); border-radius:4px; font-weight:600; }
     nav a:hover { background:var(--neon); color:var(--bg); }
-    section { max-width:1100px; margin:auto; padding:1rem 1rem 2rem; }
-    h2 { margin:.5rem 0 1rem; padding-bottom:.4rem; border-bottom:2px solid var(--neon); }
+    section { max-width:900px; margin:auto; padding:1rem; }
+    h2 { border-bottom:2px solid var(--neon); padding-bottom:.3rem; }
     .panel { background:var(--panel); border:1px solid var(--neon); border-radius:8px; padding:1rem; }
     .list { display:flex; flex-direction:column; gap:.6rem; }
-    .item { display:flex; align-items:flex-start; justify-content:space-between; gap:.8rem; border:1px dashed var(--neon); border-radius:6px; padding:.6rem; }
+    .item { display:flex; justify-content:space-between; align-items:flex-start; border:1px dashed var(--neon); border-radius:6px; padding:.6rem; }
     .item-main { flex:1; white-space:pre-wrap; }
-    .item-meta { font-size:.85rem; color:var(--muted); margin-top:.25rem; }
-    .actions { display:flex; gap:.4rem; }
-    .btn { background:none; border:1px solid var(--neon); color:var(--neon); padding:.25rem .6rem; border-radius:4px; cursor:pointer; }
-    .btn:hover { background:var(--neon); color:var(--bg); }
     form { display:grid; gap:.6rem; margin-top:.8rem; }
     input, textarea, button { background:var(--bg); color:var(--neon); border:1px solid var(--neon); border-radius:6px; padding:.6rem; }
     textarea { min-height:90px; }
-    .grid-2 { grid-template-columns:1fr 1fr; }
-    .grid-3 { grid-template-columns:repeat(3,1fr); }
-    .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:.5rem; }
-    .day { background:var(--panel); border:1px solid var(--neon); border-radius:6px; min-height:100px; padding:.5rem; }
-    .day strong { display:block; margin-bottom:.3rem; }
-    #toast { position:fixed; bottom:20px; right:20px; background:var(--neon); color:var(--bg); padding:.7rem 1rem; border-radius:6px; box-shadow:0 0 20px rgba(0,255,102,.35); display:none; font-weight:700; }
+    button { cursor:pointer; }
+    button:hover { background:var(--neon); color:var(--bg); }
+    nav {
+  background: var(--bg);
+  border-bottom: 2px solid var(--neon);
+  position: sticky;   /* keeps it fixed in place */
+  top: 0;             /* sticks to the very top */
+  z-index: 1000;      /* ensures it stays above other content */
+}
   </style>
 </head>
 <body>
   <header>
     <h1>Bros Hub</h1>
-    <div class="item-meta">Neon-green, modular, cross-device notifications enabled</div>
+    <div class="item-meta">Neon-green modular hub</div>
   </header>
 
   <nav>
@@ -45,11 +45,11 @@
       <li><a href="#chat">Chat</a></li>
       <li><a href="#stories">Stories</a></li>
       <li><a href="#notes">Notes</a></li>
-      <li><a href="#calendar">Calendar</a></li>
       <li><a href="#news">News</a></li>
       <li><a href="#announcements">Announcements</a></li>
       <li><a href="#admins">Admins</a></li>
       <li><a href="#attractions">Attractions</a></li>
+      <li><a href="admin.html">Bookings Admin</a></li>
     </ul>
   </nav>
 
@@ -59,8 +59,9 @@
     <div class="panel">
       <div id="messages" class="list"></div>
       <form id="messageForm">
+        <input id="messageName" placeholder="Your name" required />
         <input id="messageInput" placeholder="Type message..." required />
-        <button type="submit" class="btn">Send</button>
+        <button type="submit">Send</button>
       </form>
     </div>
   </section>
@@ -71,9 +72,10 @@
     <div class="panel">
       <div id="storiesBoard" class="list"></div>
       <form id="storyForm">
+        <input id="storyName" placeholder="Your name" required />
         <input id="storyTitle" placeholder="Title" required />
         <textarea id="storyContent" placeholder="Content" required></textarea>
-        <button type="submit" class="btn">Add Story</button>
+        <button type="submit">Add Story</button>
       </form>
     </div>
   </section>
@@ -84,21 +86,9 @@
     <div class="panel">
       <div id="notesBoard" class="list"></div>
       <form id="noteForm">
+        <input id="noteName" placeholder="Your name" required />
         <input id="noteInput" placeholder="Write a note..." required />
-        <button type="submit" class="btn">Add Note</button>
-      </form>
-    </div>
-  </section>
-
-  <!-- Calendar (simple demo grid; events saved to firestore, listed inline) -->
-  <section id="calendar">
-    <h2>Calendar</h2>
-    <div class="panel">
-      <div id="calendarGrid" class="calendar-grid"></div>
-      <form id="eventForm" class="grid-3">
-        <input id="eventDay" type="number" min="1" max="31" placeholder="Day (1-31)" required />
-        <input id="eventName" placeholder="Event name" required />
-        <button type="submit" class="btn">Add Event</button>
+        <button type="submit">Add Note</button>
       </form>
     </div>
   </section>
@@ -109,9 +99,10 @@
     <div class="panel">
       <div id="newsBoard" class="list"></div>
       <form id="newsForm">
+        <input id="newsName" placeholder="Your name" required />
         <input id="newsTitle" placeholder="Headline" required />
         <textarea id="newsContent" placeholder="News content..." required></textarea>
-        <button type="submit" class="btn">Add News</button>
+        <button type="submit">Add News</button>
       </form>
     </div>
   </section>
@@ -122,51 +113,48 @@
     <div class="panel">
       <div id="announcementsBoard" class="list"></div>
       <form id="announcementForm">
+        <input id="announcementName" placeholder="Your name" required />
         <input id="announcementTitle" placeholder="Title" required />
         <textarea id="announcementContent" placeholder="Details..." required></textarea>
-        <button type="submit" class="btn">Add Announcement</button>
+        <button type="submit">Add Announcement</button>
       </form>
     </div>
   </section>
 
-  <!-- Admins (cards) -->
+  <!-- Admins -->
   <section id="admins">
     <h2>Admins</h2>
     <div class="panel">
       <div id="adminsBoard" class="list"></div>
-      <form id="adminForm" class="grid-2">
+      <form id="adminForm">
         <input id="adminName" placeholder="Admin name" required />
         <input id="adminRole" placeholder="Role" required />
-        <button type="submit" class="btn">Add Admin</button>
+        <button type="submit">Add Admin</button>
       </form>
     </div>
   </section>
 
-  <!-- Attractions (name + price) -->
+  <!-- Attractions with Book Now -->
   <section id="attractions">
     <h2>Attractions</h2>
     <div class="panel">
       <div id="attractionsBoard" class="list"></div>
-      <form id="attractionForm" class="grid-2">
+      <form id="attractionForm">
+        <input id="attractionAddedBy" placeholder="Your name" required />
         <input id="attractionName" placeholder="Attraction name" required />
         <input id="attractionPrice" type="number" step="0.01" placeholder="Price" required />
-        <button type="submit" class="btn">Add Attraction</button>
+        <button type="submit">Add Attraction</button>
       </form>
     </div>
   </section>
 
-  <!-- Toast -->
-  <div id="toast"></div>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import {
-      getFirestore, collection, addDoc, onSnapshot, query, orderBy,
-      serverTimestamp, doc, deleteDoc, updateDoc
+      getFirestore, collection, addDoc, serverTimestamp,
+      onSnapshot, query, orderBy
     } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-messaging.js";
 
-    // Your provided config
     const firebaseConfig = {
       apiKey: "AIzaSyAOWDg95YOPCBYzN5vWOVBik0AUNOyqZeI",
       authDomain: "bros-hub-cdbf2.firebaseapp.com",
@@ -179,91 +167,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const messaging = getMessaging(app);
-
-    // Toast helper
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.style.display = "block";
-      setTimeout(() => { t.style.display = "none"; }, 1800);
-    }
-
-    // Service worker for background notifications
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/firebase-messaging-sw.js")
-        .then(() => console.log("SW registered"))
-        .catch(console.error);
-    }
-
-    // Request permission + save token
-    async function initNotifications() {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") return;
-      const token = await getToken(messaging, {
-        vapidKey: "BN8Symzqm70UMkbPp5CnnLg6_BcvXiKjeeLgCI10CYgC6vbNz0eN_XnA6TukL7Ozp_AtohIon7ZdtaO_gORRwHc"
-      });
-      if (token) {
-        await addDoc(collection(db, "fcmTokens"), {
-          token, tsClient: Date.now(), tsServer: serverTimestamp()
-        });
-        console.log("FCM token saved:", token);
-      }
-    }
-    initNotifications();
-
-    // Foreground push handling
-    onMessage(messaging, payload => {
-      const title = payload?.notification?.title || "New update";
-      const body = payload?.notification?.body || "";
-      new Notification(title, { body });
-    });
-
-    // Generic board renderer with edit/delete
-    function renderBoard(boardId, snapDocs, formatFn, collName) {
-      const board = document.getElementById(boardId);
-      board.innerHTML = "";
-      snapDocs.forEach(docSnap => {
-        const data = docSnap.data();
-        const item = document.createElement("div");
-        item.className = "item";
-
-        const main = document.createElement("div");
-        main.className = "item-main";
-        main.innerHTML = formatFn(data);
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        const editBtn = document.createElement("button");
-        editBtn.className = "btn";
-        editBtn.textContent = "Edit";
-        editBtn.onclick = async () => {
-          const json = prompt("Edit as JSON (e.g., {\"text\":\"Hello\"})", JSON.stringify(data, null, 2));
-          if (!json) return;
-          try {
-            const parsed = JSON.parse(json);
-            await updateDoc(doc(db, collName, docSnap.id), parsed);
-            showToast("Updated");
-          } catch (e) { alert("Invalid JSON"); }
-        };
-
-        const delBtn = document.createElement("button");
-        delBtn.className = "btn";
-        delBtn.textContent = "Delete";
-        delBtn.onclick = async () => {
-          await deleteDoc(doc(db, collName, docSnap.id));
-          showToast("Deleted");
-        };
-
-        actions.appendChild(editBtn);
-        actions.appendChild(delBtn);
-
-        item.appendChild(main);
-        item.appendChild(actions);
-        board.appendChild(item);
-      });
-    }
 
     // Collections
     const messagesRef = collection(db, "messages");
@@ -273,131 +176,203 @@
     const announcementsRef = collection(db, "announcements");
     const adminsRef = collection(db, "admins");
     const attractionsRef = collection(db, "attractions");
-    const eventsRef = collection(db, "events");
+    const bookingsRef = collection(db, "bookings");
 
-    // Live queries
+    // Live renders (with names)
     onSnapshot(query(messagesRef, orderBy("tsClient","asc")), snap => {
-      renderBoard("messages", snap.docs, d => `<div>${d.text ?? ""}</div><div class="item-meta">${new Date(d.tsClient||Date.now()).toLocaleString()}</div>`, "messages");
-    });
-    onSnapshot(query(storiesRef, orderBy("tsClient","desc")), snap => {
-      renderBoard("storiesBoard", snap.docs, d => `<strong>${d.title ?? "Untitled"}</strong>\n${d.content ?? ""}`, "stories");
-    });
-    onSnapshot(query(notesRef, orderBy("tsClient","desc")), snap => {
-      renderBoard("notesBoard", snap.docs, d => `${d.text ?? ""}`, "notes");
-    });
-    onSnapshot(query(newsRef, orderBy("tsClient","desc")), snap => {
-      renderBoard("newsBoard", snap.docs, d => `<strong>${d.title ?? "Headline"}</strong>\n${d.content ?? ""}`, "news");
-    });
-    onSnapshot(query(announcementsRef, orderBy("tsClient","desc")), snap => {
-      renderBoard("announcementsBoard", snap.docs, d => `<strong>${d.title ?? "Announcement"}</strong>\n${d.content ?? ""}`, "announcements");
-    });
-    onSnapshot(query(adminsRef, orderBy("tsClient","desc")), snap => {
-      renderBoard("adminsBoard", snap.docs, d => `<strong>${d.name ?? "Admin"}</strong>\nRole: ${d.role ?? "-"}`, "admins");
-    });
-    onSnapshot(query(attractionsRef, orderBy("tsClient","desc")), snap => {
-      renderBoard("attractionsBoard", snap.docs, d => `<strong>${d.name ?? "Attraction"}</strong>\nPrice: ${d.price ?? "-"}`, "attractions");
-    });
-
-    // Simple calendar grid (1..31)
-    const calGrid = document.getElementById("calendarGrid");
-    for (let i=1;i<=31;i++){
-      const cell = document.createElement("div");
-      cell.className = "day";
-      cell.id = `day-${i}`;
-      cell.innerHTML = `<strong>${i}</strong><div class="item-meta">No events</div>`;
-      calGrid.appendChild(cell);
-    }
-    onSnapshot(query(eventsRef, orderBy("tsClient","desc")), snap => {
-      // Reset labels
-      for (let i=1;i<=31;i++){
-        const cell = document.getElementById(`day-${i}`);
-        const meta = cell.querySelector(".item-meta");
-        if (meta) meta.textContent = "No events";
-        cell.querySelectorAll(".event").forEach(n => n.remove());
-      }
-      snap.docs.forEach(d => {
-        const e = d.data();
-        const cell = document.getElementById(`day-${e.day}`);
-        if (!cell) return;
-        const span = document.createElement("div");
-        span.className = "event";
-        span.textContent = e.name;
-        cell.appendChild(span);
-        const meta = cell.querySelector(".item-meta");
-        if (meta) meta.textContent = "";
+      const board = document.getElementById("messages");
+      board.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `<div class="item-main"><strong>${data.name || "Anonymous"}:</strong> ${data.text || ""}</div>`;
+        board.appendChild(item);
       });
     });
 
-    // Form handlers (each add shows a toast; Cloud Functions send cross-device push)
+    onSnapshot(query(storiesRef, orderBy("tsClient","desc")), snap => {
+      const board = document.getElementById("storiesBoard");
+      board.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <div class="item-main">
+            <strong>${data.title || "Untitled"}</strong>
+            <div>by ${data.name || "Anonymous"}</div>
+            <div>${data.content || ""}</div>
+          </div>`;
+        board.appendChild(item);
+      });
+    });
+
+    onSnapshot(query(notesRef, orderBy("tsClient","desc")), snap => {
+      const board = document.getElementById("notesBoard");
+      board.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `<div class="item-main"><strong>${data.name || "Anonymous"}:</strong> ${data.text || ""}</div>`;
+        board.appendChild(item);
+      });
+    });
+
+    onSnapshot(query(newsRef, orderBy("tsClient","desc")), snap => {
+      const board = document.getElementById("newsBoard");
+      board.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <div class="item-main">
+            <strong>${data.title || "Headline"}</strong>
+            <div>by ${data.name || "Anonymous"}</div>
+            <div>${data.content || ""}</div>
+          </div>`;
+        board.appendChild(item);
+      });
+    });
+
+    onSnapshot(query(announcementsRef, orderBy("tsClient","desc")), snap => {
+      const board = document.getElementById("announcementsBoard");
+      board.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <div class="item-main">
+            <strong>${data.title || "Announcement"}</strong>
+            <div>by ${data.name || "Anonymous"}</div>
+            <div>${data.content || ""}</div>
+          </div>`;
+        board.appendChild(item);
+      });
+    });
+
+    onSnapshot(query(adminsRef, orderBy("tsClient","desc")), snap => {
+      const board = document.getElementById("adminsBoard");
+      board.innerHTML = "";
+      snap.forEach(d => {
+        const data = d.data();
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <div class="item-main">
+            <strong>${data.name || "Admin"}</strong>
+            <div>Role: ${data.role || "-"}</div>
+          </div>`;
+        board.appendChild(item);
+      });
+    });
+
+    // Attractions with Book Now (and creator name)
+    onSnapshot(query(attractionsRef, orderBy("tsClient","desc")), snap => {
+      const board = document.getElementById("attractionsBoard");
+      board.innerHTML = "";
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        const item = document.createElement("div");
+        item.className = "item";
+
+        const main = document.createElement("div");
+        main.className = "item-main";
+        main.innerHTML = `
+          <strong>${data.name || "Attraction"}</strong> — $${data.price || "-"}
+          <div class="item-meta">Added by ${data.addedBy || "Anonymous"}</div>
+        `;
+
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = "Book Now";
+        btn.onclick = async () => {
+          const customer = prompt("Your name for booking:");
+          if (!customer) return;
+          await addDoc(bookingsRef, {
+            customer, attraction: data.name, price: data.price,
+            status: "pending",
+            tsClient: Date.now(),
+            tsServer: serverTimestamp()
+          });
+          alert(`Booking created for ${data.name} by ${customer}`);
+        };
+
+        item.appendChild(main);
+        item.appendChild(btn);
+        board.appendChild(item);
+      });
+    });
+
+    // Form handlers (writes with names)
     document.getElementById("messageForm").addEventListener("submit", async e => {
       e.preventDefault();
+      const name = document.getElementById("messageName").value.trim();
       const text = document.getElementById("messageInput").value.trim();
-      if (!text) return;
-      await addDoc(messagesRef, { text, tsClient: Date.now(), tsServer: serverTimestamp() });
+      if (!name || !text) return;
+      await addDoc(messagesRef, { name, text, tsClient: Date.now(), tsServer: serverTimestamp() });
       e.target.reset();
-      showToast("Message sent");
     });
 
     document.getElementById("storyForm").addEventListener("submit", async e => {
       e.preventDefault();
+      const name = document.getElementById("storyName").value.trim();
       const title = document.getElementById("storyTitle").value.trim();
       const content = document.getElementById("storyContent").value.trim();
-      await addDoc(storiesRef, { title, content, tsClient: Date.now(), tsServer: serverTimestamp() });
+      if (!name || !title || !content) return;
+      await addDoc(storiesRef, { name, title, content, tsClient: Date.now(), tsServer: serverTimestamp() });
       e.target.reset();
-      showToast("Story added");
     });
 
     document.getElementById("noteForm").addEventListener("submit", async e => {
       e.preventDefault();
+      const name = document.getElementById("noteName").value.trim();
       const text = document.getElementById("noteInput").value.trim();
-      await addDoc(notesRef, { text, tsClient: Date.now(), tsServer: serverTimestamp() });
+      if (!name || !text) return;
+      await addDoc(notesRef, { name, text, tsClient: Date.now(), tsServer: serverTimestamp() });
       e.target.reset();
-      showToast("Note added");
     });
 
     document.getElementById("newsForm").addEventListener("submit", async e => {
       e.preventDefault();
+      const name = document.getElementById("newsName").value.trim();
       const title = document.getElementById("newsTitle").value.trim();
       const content = document.getElementById("newsContent").value.trim();
-      await addDoc(newsRef, { title, content, tsClient: Date.now(), tsServer: serverTimestamp() });
+      if (!name || !title || !content) return;
+      await addDoc(newsRef, { name, title, content, tsClient: Date.now(), tsServer: serverTimestamp() });
       e.target.reset();
-      showToast("News posted");
     });
 
     document.getElementById("announcementForm").addEventListener("submit", async e => {
       e.preventDefault();
+      const name = document.getElementById("announcementName").value.trim();
       const title = document.getElementById("announcementTitle").value.trim();
       const content = document.getElementById("announcementContent").value.trim();
-      await addDoc(announcementsRef, { title, content, tsClient: Date.now(), tsServer: serverTimestamp() });
+      if (!name || !title || !content) return;
+      await addDoc(announcementsRef, { name, title, content, tsClient: Date.now(), tsServer: serverTimestamp() });
       e.target.reset();
-      showToast("Announcement posted");
     });
 
     document.getElementById("adminForm").addEventListener("submit", async e => {
       e.preventDefault();
-      const name = document.getElementById("adminName").value.trim();
-      const role = document.getElementById("adminRole").value.trim();
-      await addDoc(adminsRef, { name, role, tsClient: Date.now(), tsServer: serverTimestamp() });
+      const adminName = document.getElementById("adminName").value.trim();
+      const adminRole = document.getElementById("adminRole").value.trim();
+      if (!adminName || !adminRole) return;
+      await addDoc(adminsRef, { name: adminName, role: adminRole, tsClient: Date.now(), tsServer: serverTimestamp() });
       e.target.reset();
-      showToast("Admin added");
     });
 
     document.getElementById("attractionForm").addEventListener("submit", async e => {
       e.preventDefault();
+      const addedBy = document.getElementById("attractionAddedBy").value.trim();
       const name = document.getElementById("attractionName").value.trim();
       const price = document.getElementById("attractionPrice").value.trim();
-      await addDoc(attractionsRef, { name, price, tsClient: Date.now(), tsServer: serverTimestamp() });
+      if (!addedBy || !name || !price) return;
+      await addDoc(attractionsRef, { addedBy, name, price, tsClient: Date.now(), tsServer: serverTimestamp() });
       e.target.reset();
-      showToast("Attraction added");
-    });
-
-    document.getElementById("eventForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const day = Number(document.getElementById("eventDay").value);
-      const name = document.getElementById("eventName").value.trim();
-      await addDoc(eventsRef, { day, name, tsClient: Date.now(), tsServer: serverTimestamp() });
-      e.target.reset();
-      showToast("Event added");
     });
   </script>
 </body>
